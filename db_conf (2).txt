@@ -1,0 +1,131 @@
+###Sales
+
+CREATE TABLE `sales` (
+	`sales_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`product_id` INT(11) NOT NULL,
+	`owner_id` INT(11) NOT NULL,
+	`timeperiod_id` INT(11) NOT NULL,
+	`city_id` INT(11) NOT NULL,
+	`store_id` INT(11) NOT NULL,
+	`profit_loss` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`sales_id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+## city
+
+CREATE TABLE `city` (
+	`city_id` INT(11) NOT NULL,
+	`city_name` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`city_id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+## owner
+
+CREATE TABLE `owner` (
+	`owner_id` INT(11) NOT NULL,
+	`owner_name` VARCHAR(255 ) NOT NULL,
+	`owner_email` VARCHAR(255 ) NOT NULL,
+	PRIMARY KEY (`owner_id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+## product
+
+CREATE TABLE `product` (
+	`product_id` INT(11) NOT NULL,
+	`product_name` VARCHAR(50) NOT NULL,
+	`product_desc` VARCHAR(255) NOT NULL,
+	`owner_id` INT(11) NOT NULL,
+	`product_price` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`product_id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+## timeperiod
+
+CREATE TABLE `timeperiod` (
+	`timeperiod_id` INT(11) NOT NULL,
+	`timeperiod_name` VARCHAR(50) NOT NULL,
+	`displayflag` INT(11) NOT NULL,
+	`displayorder` INT(11) NOT NULL
+)
+COLLATE='utf8_general_ci'
+;
+
+ALTER TABLE `timeperiod`
+	ADD PRIMARY KEY (`timeperiod_id`);
+	
+## store
+
+CREATE TABLE `store` (
+	`store_id` INT(11) NOT NULL,
+	`store_name` VARCHAR(50) NOT NULL,
+	`owner_id` INT(11) NOT NULL,
+	`address` VARCHAR(255) NOT NULL,
+	`city_id` INT(11) NOT NULL,
+	PRIMARY KEY (`store_id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+## shop
+
+CREATE TABLE `shop` (
+	`id` INT(11) NOT NULL,
+	`store_name` VARCHAR(50) NOT NULL,
+	`address` VARCHAR(50) NOT NULL,
+	`city` VARCHAR(50) NOT NULL,
+	`month` VARCHAR(50) NOT NULL,
+	`product` VARCHAR(50) NOT NULL,
+	`equation` VARCHAR(50) NOT NULL,
+	`owner_email` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+CREATE TABLE `raw_data_dump` (
+	`id` INT(11) NOT NULL,
+	`store_name` VARCHAR(255) NOT NULL,
+	`address` VARCHAR(255) NOT NULL,
+	`city` VARCHAR(255) NOT NULL,
+	`month` VARCHAR(255) NOT NULL,
+	`equation` VARCHAR(255) NOT NULL,
+	`owner_email` VARCHAR(255) NOT NULL,
+	`owner_name` VARCHAR(255) NOT NULL,
+	`product_desc` VARCHAR(255) NOT NULL,
+	`product_price` VARCHAR(255) NOT NULL,
+	`percentage` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+CREATE TABLE `users` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`email` VARCHAR(50) NOT NULL,
+	`password` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`id`)
+)
+COLLATE='utf8_general_ci'
+;
+
+
+## ALTER QUERIES
+ALTER TABLE `sales`
+	ADD COLUMN `percentage` VARCHAR(255) NOT NULL AFTER `profit_loss`;
+
+ALTER TABLE `raw_data_dump`
+	ADD COLUMN `product` VARCHAR(255) NOT NULL AFTER `month`;
+
+ALTER TABLE `sales`
+	CHANGE COLUMN `percentage` `percent` VARCHAR(255) NOT NULL COLLATE 'utf8_general_ci' AFTER `profit_loss`;
+
+ALTER TABLE `raw_data_dump`
+	CHANGE COLUMN `percentage` `percentage_new` VARCHAR(255) NOT NULL COLLATE 'utf8_general_ci' AFTER `product_price`;

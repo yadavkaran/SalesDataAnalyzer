@@ -1,0 +1,83 @@
+BEGIN 
+DECLARE v_finished INTEGER DEFAULT 0;
+DECLARE v_rec_id INT  DEFAULT 0;
+DEClARE rec_cursor CURSOR FOR SELECT rec_id FROM tmp;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_finished = 1;
+
+CREATE TABLE tmp as SELECT * FROM raw_data_dump;
+ALTER TABLE tmp ADD COLUMN rec_id BIGINT(20) AUTO_INCREMENT PRIMARY KEY;
+
+UPDATE tmp SET store_name=TRIM(store_name),address=TRIM(address),city=TRIM(city),month=TRIM(month),product=TRIM(product),equation=TRIM(equation),owner_email=TRIM(owner_email),owner_name=TRIM(owner_name),product_desc=TRIM(product_desc),product_price=TRIM(product_price),percentage_new=TRIM(percentage_new);
+
+SELECT count(*) INTO @max_rows FROM tmp;
+SET @rec_cnt=0;
+OPEN rec_cursor;
+			
+			get_rec: LOOP
+		
+					FETCH rec_cursor INTO v_rec_id;
+					IF @rec_cnt=@max_rows THEN 
+							LEAVE get_rec;
+					END IF; 
+					
+					## store_name = @V1
+					## address = @V2
+					## city = @V3
+					## month = @V4
+					## product = @V5
+					## equation = @V6
+					## owner_email = @V7
+					## owner_name = @V8
+					## product_desc = @V9
+					## product_price = @V10
+					## percentage_new = @V11
+					
+					SELECT store_name,address,city,month,product,equation,owner_email,owner_name,product_desc,product_price,percentage_new
+					INTO @V1,@V2,@V3,@V4,@V5,@V6,@V7,@V8,@V9,@V10,@V11
+					FROM tmp WHERE rec_id=v_rec_id;
+					
+					SET @owner_email = NULL;
+					SET @OwnerID = NULL;
+					SELECT owner_id INTO @OwnerID FROM owner WHERE owner_email=@V7 AND owner_name=@V8;
+					IF @OwnerID IS NULL AND @V7 IS NOT NULL THEN
+						INSERT INTO owner(owner_name,owner_email) VALUES (@V8,@V7);
+						SET @OwnerID=LAST_INSERT_ID();
+					END IF;
+					
+					SET @CityID = NULL;
+					SELECT city_id INTO @CityID FROM city WHERE city_name=@V3;
+					IF @CityID IS NULL AND @V3 IS NOT NULL THEN
+						INSERT INTO city(city_name) VALUES (@V3);
+						SET @CityID=LAST_INSERT_ID();
+					END IF;
+					
+					SET @StoreID = NULL;
+					SELECT store_id INTO @StoreID FROM store WHERE store_name=@V1 AND owner_id = @OwnerID AND city_id = @CityID;
+					IF @StoreID IS NULL AND @V1 IS NOT NULL THEN
+						INSERT INTO store(store_name,owner_id,address,city_id) VALUES (@V1,@OwnerID,@V2,@CityID);
+						SET @StoreID=LAST_INSERT_ID();
+					END IF;
+
+					
+					SET @ProductID = NULL;
+					SELECT product_id INTO @ProductID FROM product WHERE owner_id = @OwnerID AND product_name = @V5;
+					IF @ProductID IS NULL AND @V5 IS NOT NULL THEN
+						INSERT INTO product(product_name,product_desc,owner_id,product_price) VALUES (@V5,@V9,@OwnerID,@V10);
+						SET @ProductID=LAST_INSERT_ID();
+					END IF;
+
+					SET @TimeperiodID = NULL;
+					SELECT timeperiod_id INTO @TimeperiodID from timeperiod WHERE timeperiod_name = @V4;
+						IF @TimeperiodID IS NULL AND @V4 IS NOT NULL THEN
+							INSERT INTO timeperiod(timeperiod_name,displayflag,displayorder) VALUES (@V4,1,1);
+							SET @TimeperiodID=LAST_INSERT_ID();
+						END IF;
+
+					INSERT INTO sales(product_id,owner_id,timeperiod_id,city_id,store_id,profit_loss,percent) VALUES (@ProductID,@OwnerID,@TimeperiodID,@CityID,@StoreID,@V6,@V11);
+					SET @rec_cnt = @rec_cnt + 1;
+		   END LOOP get_rec;
+ 
+CLOSE rec_cursor;
+SELECT CONCAT(@rec_cnt, ' row(s) inserted successfully!');
+DROP TABLE IF EXISTS tmp;
+END
