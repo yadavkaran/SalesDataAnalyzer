@@ -42,3 +42,43 @@ To use SDA, users need to follow these steps:
 
 ### Conclusion
 SDA is a robust tool designed to enhance the operational efficiency of small to medium-sized businesses by providing actionable insights from sales data. Its straightforward technologies and algorithms ensure reliability, ease of use, and effective decision-making based on data-driven insights.
+
+
+
+**Database Overview:**
+
+sales:
+Purpose: Tracks sales transactions including details like product, owner, and store.
+Columns: sales_id, product_id, owner_id, timeperiod_id, city_id, store_id, profit_loss, percent.
+Normalization: The table is in 3NF as all non-primary key columns are functionally dependent only on the primary key (sales_id), and there are no transitive dependencies.
+
+city:
+Purpose: Contains information about different cities.
+Columns: city_id, city_name.
+Normalization: This table is in 3NF because each column is directly dependent on the primary key (city_id), and no other dependencies exist.
+
+owner:
+Purpose: Stores information about product owners.
+Columns: owner_id, owner_name, owner_email.
+Normalization: It's in 3NF as each attribute is functionally dependent on the primary key (owner_id), and no transitive dependencies are present.
+
+product:
+Purpose: Manages details about products.
+Columns: product_id, product_name, product_desc, owner_id, product_price.
+Normalization: The table adheres to 3NF. The non-key attributes are dependent on product_id, and it contains no transitive dependencies since owner_id acts as a foreign key linking to the owner table.
+
+timeperiod:
+Purpose: Holds information regarding specific time periods.
+Columns: timeperiod_id, timeperiod_name, displayflag, displayorder.
+Normalization: It's in 3NF because each attribute is dependent on the primary key, and there is no dependency between non-key attributes.
+
+store:
+Purpose: Details of various stores.
+Columns: store_id, store_name, owner_id, address, city_id.
+Normalization: This table is in 3NF. All attributes are functionally dependent on the primary key, and owner_id and city_id serve as foreign keys.
+
+users:
+Purpose: Manages user login credentials.
+Columns: id, email, password.
+Normalization: This table is in 3NF as there are no dependencies among non-key attributes and each attribute is solely dependent on the primary key (id).
+
