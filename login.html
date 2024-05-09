@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #FFA500, #000000);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: #FFA500;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container label {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .login-container input {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .login-container input[type="submit"] {
+            background: #000000;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .login-container input[type="submit"]:hover {
+            background: #000000;
+        }
+    </style>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- <link rel="stylesheet" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginform">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            <button onClick="sendloginrequest()" type="button" id="login">Login</button>
+        </form>
+    </div>
+</body>
+<script>
+    // function sendloginrequest(){
+    //     console.log("Hi");
+    //     var resultobj;
+    //     var data = {
+    //         username: $("#username").val(),
+    //         password: $("#password").val()
+    //     };
+    //         // var result;
+    //         // // var zapiurl =  + '/API_URL' + zurl;
+    //         var formData = JSON.stringify(data);
+    //         // console.log('formdata',formData);
+    //         $.ajax({
+    //         type: "POST",
+    //                 url: "http://localhost:8080/login",
+    //                 data: formData,
+    //                 dataType: 'json',
+    //                 async: !1,
+    //                 success: function (data) {
+    //                 resultobj = data;
+    //                         if (resultobj.success == false && resultobj.errorcode == 'BS100') {
+    //                 sweetAlert("Oops...", "Your session has been expired! Please login again.", "error");
+    //                         $(".sa-confirm-button-container button").click(function () {
+    //                 logout();
+    //                 });
+    //                 }
+    //                 }
+    //         });
+    function sendloginrequest(){
+    // console.log("Hi");
+    var resultobj;
+    var data = {
+        username: $("#username").val(),
+        password: $("#password").val()
+    };
+    var formData = JSON.stringify(data);
+
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/login",
+        data: formData,
+        dataType: 'json',
+        processData: false, // set to false to prevent jQuery from transforming the data
+        contentType: 'application/json', // set the content type to application/json
+        async: false,
+        success: function (data) {
+            resultobj = data;   
+            console.log(data);
+            if(resultobj == true){
+                // console.log('Hi');
+                localStorage.setItem("email", $("#username").val());
+                localStorage.setItem("password", $("#password").val());
+                return window.location.replace("http://localhost/charts.html");
+            }else{
+                alert("Wrong credentials");
+                // Swal.fire({
+                //     icon: "error",
+                //     title: "Oops...",
+                //     text: "Wrong credentials"
+                // });
+            }
+        }
+    });
+
+            // var httpRequest=new XMLHttpRequest();
+            // httpRequest.open("POST","http://localhost:8080/login",true);
+            // httpRequest.setRequestHeader("Content-Type","applicaton/json");
+            // var jsonData = {
+            //     username: $("#username").val(),
+            //     password: $("#password").val()
+            // };
+            // var jsonString = JSON.stringify(jsonData);
+            // httpRequest.onreadystatechange = function () {
+            // if (httpRequest.readyState === 4) {
+            //     if (httpRequest.status === 200) {
+            //     // Request was successful, handle the response here
+            //     console.log(httpRequest.responseText);
+            //     } else {
+            //     // There was an error with the request
+            //     console.error("Error: " + httpRequest.status);
+            //     }
+            // }
+            // };
+            // httpRequest.send(jsonString);
+            // return httpRequest.responseText;
+            // $.ajax({
+            //     url: 'http://localhost:8080/login',
+            //     type: 'POST',
+            //     data: JSON.stringify(data),
+            //     dataType: 'json',
+            //     success: function(data) {
+            //         console.log('success', data);
+            //     },
+            //     error: function(data) {
+            //         console.log('error', data);
+            //     }
+            // });
+            // return data;
+    }
+</script>
+</html>

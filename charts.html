@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px;
+        }
+        .chart-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 60px;
+            text-align: center;
+            width: 300px;
+            margin: 10px;
+            width: 40%; /* Adjust the width as needed */
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            display: none;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3; /* Light gray */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hide-loader{
+        display:none;
+        }
+	    .navbar {
+				  background-color: #333;
+				  overflow: hidden;
+				  position: fixed;
+				  top: 0;
+				  width: 100%;
+				}
+
+		.navbar a {
+				  float: left;
+				  display: block;
+				  color: #f2f2f2;
+				  text-align: center;
+				  padding: 14px 16px;
+				  text-decoration: none;
+				}
+
+		.navbar a:hover {
+				  background-color: #ddd;
+				  color: black;
+				}
+
+		.navbar a.dropdown {
+				  float: none;
+				  display: none;
+				  position: absolute;
+				  background-color: #f9f9f9;
+				  min-width: 160px;
+				  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+				  z-index: 1;
+				}
+
+		.navbar a.dropdown:hover {
+				  background-color: #ddd;
+				  color: black;
+				}
+
+		.navbar a.dropdown-button {
+				  cursor: pointer;
+				  position: relative;
+				  display: block;
+				}
+
+		.navbar a.dropdown-button:after {
+				  content: " ▾";
+				}
+
+		.navbar a.dropdown-button:hover .dropdown {
+				  display: block;
+				}
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0071a4, #01a7f4);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chart-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+            margin: 10px;
+        }
+
+        .chart-container h2 {
+            color: #0071a4;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: #f4f4f4;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+	<div class="navbar">
+    <!-- <a href="#">Home</a>
+    <a href="#">Data Upload</a>
+    <a href="#">Contact</a> -->
+    <a href="#" class="input-container">
+		   <label for="gender">Product</label>
+		   <select id="productfilter" name="productfilter" required>
+		   </select>
+    </a>
+    <!-- <a href="#" class="input-container" multiple>
+        <label for="gender">Timeperiod</label>
+        <select id="timeperiodfilter" name="timeperiodfilter[]" multiple="multiple">
+        </select>
+    </a> -->
+	</div>
+	
+	<script>
+        var new_arr = [];
+ function getSelectedValue() {
+    var select = document.getElementById("select");
+    var selectedOption = select.options[select.selectedIndex];
+    var selectedValue = selectedOption.value;
+    alert("The selected value is: " + selectedValue);
+ }
+</script>
+	<!-- <div class="navbar">
+    <a href="#">Home</a>
+    <a href="#">Data Upload</a>
+    <a href="#">Contact</a>
+    <a href="#" class="dropdown-button">Dropdown
+      <div class="dropdown">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
+    </a>
+	</div> -->
+    <!-- <div class="loader" id="loader"> -->
+        <div class="loader-container" id="loaderContainer">
+            <div class="loader"></div>
+        </div>
+
+        <div class="chart-row">
+            <!-- Chart 1 -->
+            <div id="1_chart" class="chart-container">
+                <!-- <canvas id="chart1"></canvas> -->
+            </div>
+
+            <!-- Chart 2 -->
+            <div id="2_chart" class="chart-container">
+                <!-- <canvas id="chart2"></canvas> -->
+            </div>
+        </div>
+
+        <div class="chart-row">
+            <!-- Chart 3 -->
+            <div id="3_chart" class="chart-container">
+                <!-- <canvas id="chart3"></canvas> -->
+            </div>
+
+            <!-- Chart 4 -->
+            <div id="4_chart" class="chart-container">
+                <!-- <canvas id="chart4"></canvas> -->
+            </div>
+        </div>
+    <!-- </div> -->
+    <!-- JavaScript to create and update the charts -->
+    <script>
+        var email_owner = localStorage.getItem("email");
+            var password_owner = localStorage.getItem("password");
+            var data = {
+                username: email_owner,
+                password: password_owner
+            };
+            var formData = JSON.stringify(data);
+            $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/getproduct",
+            data: formData,
+            dataType: 'json',
+            processData: false, // set to false to prevent jQuery from transforming the data
+            contentType: 'application/json', // set the content type to application/json
+            async: false,
+            success: function (data) {
+                resultobj = data;   
+                console.log(data);
+                if(resultobj){
+                    console.log('Hi');
+                    addproductfilter(data);
+                }else{
+                    alert("No product information available");
+                    // Swal.fire({
+                    //     icon: "error",
+                    //     title: "Oops...",
+                    //     text: "Wrong credentials"
+                    // });
+                }
+            }
+        });
+        function addproductfilter(data){
+            var i = 1;
+            $.each(data, function (k, v) {
+                    if(i == 1){
+                        $("#productfilter").append('<option value="' + v.product_id + '" selected>' + v.product_name + '</option>');
+                    }else{
+                        $("#productfilter").append('<option value="' + v.product_id + '">' + v.product_name + '</option>');
+                    }
+                i++;
+            });
+        }
+        $('#productfilter').change(function () {
+        $("#1_chart").html('<canvas id="chart1"></canvas>');
+        $("#2_chart").html('<canvas id="chart2"></canvas>');
+        $("#3_chart").html('<canvas id="chart3"></canvas>');
+        $("#4_chart").html('<canvas id="chart4"></canvas>');
+        // chart1.destroy();
+        // chart2.destroy();
+        // chart3.destroy();
+        // chart4.destroy();
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/gettimeperiod",
+            data: formData,
+            dataType: 'json',
+            processData: false, // set to false to prevent jQuery from transforming the data
+            contentType: 'application/json', // set the content type to application/json
+            async: false,
+            success: function (data) {
+                resultobj = data;   
+                console.log(data);
+                if(resultobj){
+                    console.log('Hi');
+                    // addtimeperiodfilter(data);
+                    settparray(data);
+                }else{
+                    alert("No product information available");
+                    // Swal.fire({
+                    //     icon: "error",
+                    //     title: "Oops...",
+                    //     text: "Wrong credentials"
+                    // });
+                }
+            }
+        });
+        function settparray(data){
+            $.each(data, function (k, v) {
+                new_arr[v.timeperiod_id] = v.timeperiod_name;
+            });
+            console.log("new_arr",new_arr);
+        }
+        var product_id = $("#productfilter").val();
+    var timeperiod_id = $("#timeperiodfilter").val();
+    var data_new = {
+        username: email_owner,
+        password: password_owner,
+        productId: product_id
+    };
+    var formData_new = JSON.stringify(data_new);
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/getsales",
+        data: formData_new,
+        dataType: 'json',
+        processData: false, // set to false to prevent jQuery from transforming the data
+        contentType: 'application/json', // set the content type to application/json
+        async: false,
+        success: function (data) {
+            resultobj = data;   
+            console.log(data);
+            if(resultobj){
+                // console.log(data);
+                createchart(data);
+                // addtimeperiodfilter(data);
+            }else{
+                alert("No product information available");
+                // Swal.fire({
+                //     icon: "error",
+                //     title: "Oops...",
+                //     text: "Wrong credentials"
+                // });
+            }
+        }
+    });
+    function createchart(data){
+        var datalabels = [];
+        var datasets_new = [];
+        j = 0;
+        $.each(data, function (k, v) {
+            datalabels[j] = new_arr[v.timeperiod_id];
+            datasets_new[j] = v.percent;
+            j++;
+        });
+        // console.log(datalabels);
+        // console.log(datasets_new);
+        // Chart 1
+        var ctx1 = document.getElementById('chart1').getContext('2d');
+        var chart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: datalabels,
+                datasets: [{
+                    label: 'Chart 1',
+                    data: datasets_new,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            
+        });
+
+        // Chart 2
+        var ctx2 = document.getElementById('chart2').getContext('2d');
+        var chart2 = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: datalabels,
+                datasets: [{
+                    label: 'Chart 2',
+                    data: datasets_new,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            }
+        });
+
+        // Chart 3
+        var ctx3 = document.getElementById('chart3').getContext('2d');
+        var chart3 = new Chart(ctx3, {
+            type: 'pie',
+            data: {
+                labels: datalabels,
+                datasets: [{
+                    label: 'Chart 3',
+                    data: datasets_new,
+                    backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 255, 0, 0.7)'],
+                    borderColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 255, 0, 0.7)'],
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Chart 4
+        var ctx4 = document.getElementById('chart4').getContext('2d');
+        var chart4 = new Chart(ctx4, {
+            type: 'doughnut',
+            data: {
+                labels: datalabels,
+                datasets: [{
+                    label: 'Chart 4',
+                    data: datasets_new,
+                    backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 255, 0, 0.7)'],
+                    borderWidth: 1
+                }]
+            }
+        });
+    }
+
+        });
+        
+    // function addtimeperiodfilter(data){
+    //     var i = 1;
+    //     $.each(data, function (k, v) {
+    //         $("#timeperiodfilter").append('<option value="' + v.timeperiod_id + '">' + v.timeperiod_name + '</option>');    
+    //     });
+    //     $('.js-example-basic-multiple').select2();
+    //     // $("#timeperiodfilter").multiselect({
+    //     //     columns: 1,
+    //     //     placeholder: 'Select options',
+    //     //     selectAll: true,
+    //     //     minHeight: 100,
+    //     // });
+    //     // $("#timeperiodfilter").multiselect("reload");
+    // }
+    
+    // $(document).ready(function () {
+    //     // showPreloader();
+    //     setTimeout(function () {
+    //         $("#productfilter").trigger('change');
+    //     }, 200);
+    // }); 
+        
+    $("#productfilter").trigger('change');
+        // $('#globalbrandFilter').change(function () {
+        //     $('#categoryFilter').empty();
+        // }, 200);
+    </script>
+</body>
+</html>
