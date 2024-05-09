@@ -40,8 +40,7 @@ To use SDA, users need to follow these steps:
 2. Upload Data: Users can upload their sales data in the specified Excel format.
 3. View Analytics: Users can navigate to the sales page to view personalized sales analytics and insights based on their uploaded data.
 
-### Conclusion
-SDA is a robust tool designed to enhance the operational efficiency of small to medium-sized businesses by providing actionable insights from sales data. Its straightforward technologies and algorithms ensure reliability, ease of use, and effective decision-making based on data-driven insights.
+
 
 
 
